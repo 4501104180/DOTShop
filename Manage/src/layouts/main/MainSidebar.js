@@ -30,9 +30,9 @@ const MainSidebar = ({ isOpenSidebar, onCloseSidebar }) => {
                 <Box
                     component='img'
                     alt='logo'
-                    src='/logo-cv-white-800.png'
+                    src='/dotlogo.png'
                     sx={{
-                        width: '50px'
+                        width: '150px'
                     }}
                 />
             </Box>

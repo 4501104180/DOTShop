@@ -1,7 +1,7 @@
 const bcrypt = require('bcrypt');
 const { generateToken } = require('../../utils/jwt');
 const Account = require('../models/Account');
-
+const mongoose = require('mongoose');
 class AccountsAPI {
     // [GET] /accounts/checkExist/:email
     async checkExist(req, res) {
@@ -92,6 +92,73 @@ class AccountsAPI {
             res.json({
                 message: 'Register successfully!'
             });
+        } catch (error) {
+            console.log(error);
+        };
+    };
+    // [POST] /accounts
+    async insert(req, res) {
+        try {
+            const { password } = req.body;
+            const saltRounds = 10;
+            const hashedPassword = await bcrypt.hash(password, saltRounds);
+            const account = new Account({
+                ...req.body,
+                password: hashedPassword,
+                image: req.file.originalname
+            })
+            await account.save();
+            res.json({
+                message: 'Insert successfully!'
+            });
+        } catch (error) {
+            console.log(error);
+        };
+    };
+    // [PUT] /accounts/:accountID
+    async edit(req, res) {
+        try {
+            const { password } = req.body;
+            const saltRounds = 10;
+            const hashedPassword = await bcrypt.hash(password, saltRounds);
+            const { accountID } = req.params;
+            const result = await Account.findByIdAndUpdate(accountID, {
+                ...req.body,
+                password: hashedPassword,
+                image: req.file.originalname
+            })
+            res.json(result);
+        } catch (error) {
+            console.log(error);
+        };
+    };
+    // [DELETE] /accounts/:accountID
+    async deletebyID(req, res) {
+        try {
+            const deletor = mongoose.Types.ObjectId("61af7d561ab0c6ea12eaa560");
+            const { accountID } = req.params;
+            const result = await Account
+            .delete({ _id: accountID }, deletor );
+                res.json({
+                    ...result,
+                    accountID
+                });
+        } catch (error) {
+            console.log(error);
+        };
+    };
+
+    // [DELETE] /accounts/
+    async deletedAll(req, res) {
+        try {
+            const deletor = mongoose.Types.ObjectId("61af7d561ab0c6ea12eaa560");
+            const { accounts } = req.body;
+            const result = await Account
+            .delete({ _id: { $in: accounts }}, deletor );
+                res.json({
+                    ...result,
+                    accounts
+                });
         } catch (error) {
             console.log(error);
         };
