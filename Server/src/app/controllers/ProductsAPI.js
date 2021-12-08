@@ -1,5 +1,5 @@
 const Product = require('../models/Product');
-
+const mongoose = require('mongoose');
 class ProductsAPI {
     // [GET] /products/:page/:number
     async findAllWithPagination(req, res) {
@@ -148,8 +148,18 @@ class ProductsAPI {
 
     // [POST] /products
     async insertProduct(req, res) {
+        const images = req.files.map( file => file.originalname );
         try {
-            const product = new Product(req.body);
+            const product = new Product({
+                ...req.body,
+                images,
+                categoryId:JSON.parse(req.body.categoryId),
+                information:JSON.parse(req.body.information),
+                warranty:JSON.parse(req.body.warranty),
+                tags:JSON.parse(req.body.tags)
+            
+            });
+        
             await product.save();
             res.json({
                 status: 'success',
@@ -158,6 +168,60 @@ class ProductsAPI {
         } catch (error) {
             console.log(error);
         }
+    };
+    // [PUT] /products/:productID
+    async editProductById(req, res) {
+        const { productID } = req.params;
+        const images = req.files.map( file => file.originalname );
+        try {
+            const product = await Product.findByIdAndUpdate(productID,{
+                ...req.body,
+                images,
+                categoryId:JSON.parse(req.body.categoryId),
+                information:JSON.parse(req.body.information),
+                warranty:JSON.parse(req.body.warranty),
+                tags:JSON.parse(req.body.tags)
+            
+            });
+            res.json({
+                product,
+                status: 'success',
+                message: 'Edit product successfully!'
+            });
+        } catch (error) {
+            console.log(error);
+        }
+    };
+    // [DELETE] /product/:productID
+    async deleteProductById(req, res) {
+        try {
+            const deletor = mongoose.Types.ObjectId("61af7d561ab0c6ea12eaa560");
+            const { productID } = req.params;
+            const result = await Product
+            .delete({ _id: productID }, deletor );
+                res.json({
+                    ...result,
+                    productID
+                });
+        } catch (error) {
+            console.log(error);
+        };
+    };
+
+    // [DELETE] /products/
+    async deletedProductAll(req, res) {
+        try {
+            const deletor = mongoose.Types.ObjectId("61af7d561ab0c6ea12eaa560");
+            const { products } = req.body;
+            const result = await Product
+            .delete({ _id: { $in: products }}, deletor );
+                res.json({
+                    ...result,
+                    products
+                });
+        } catch (error) {
+            console.log(error);
+        };
     };
 };
 
