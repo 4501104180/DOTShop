@@ -15,10 +15,14 @@ class AccountsAPI {
     };
 
     // [GET] /accounts
-    findAll(req, res, next) {
-        Account.find({})
-            .then(accounts => res.json(accounts))
-            .catch(next);
+    async findAll(req, res) {
+        try {
+            const accounts = await Account
+                .find({});
+            res.json(accounts);
+        } catch (error) {
+            console.log(error);
+        }
     };
 
     // [GET] /accounts/profile
@@ -99,7 +103,13 @@ class AccountsAPI {
     // [POST] /accounts
     async insert(req, res) {
         try {
-            const { password } = req.body;
+            const { email, password } = req.body;
+            const accountExisted = await Account.findOne({ email: email });
+            if (accountExisted) {
+                res.statusMessage = 'This account already exists!';
+                res.status(400).end();
+                return;
+            }
             const saltRounds = 10;
             const hashedPassword = await bcrypt.hash(password, saltRounds);
             const account = new Account({
@@ -109,7 +119,8 @@ class AccountsAPI {
             })
             await account.save();
             res.json({
-                message: 'Insert successfully!'
+                message: 'Insert successfully!',
+                account
             });
         } catch (error) {
             console.log(error);

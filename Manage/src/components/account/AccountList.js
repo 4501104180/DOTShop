@@ -1,10 +1,14 @@
 import { useNavigate } from 'react-router-dom';
 import MaterialTable from '@material-table/core';
-import { Stack, Box, Typography, Chip } from '@mui/material';
+import { Stack, Box, Typography } from '@mui/material';
 import { AddCircle, Edit, Delete } from '@mui/icons-material';
-
+import { useState, useEffect} from 'react';
+//apis
+import accountApi from '../../apis/accountApi';
 // path
 import { PATH_DASHBOARD } from '../../routes/path'
+// utils
+import { fDate} from '../../utils/formatDate'
 
 const columns = [
     {
@@ -16,7 +20,7 @@ const columns = [
         
         field: 'name',
         title: 'Name',
-        width: '30%',
+        width: '25%',
         render: row => (
             <Stack
                 direction='row'
@@ -26,7 +30,7 @@ const columns = [
                 <Box
                     component='img'
                     alt={row.name}
-                    src={row.image}
+                    src={`${process.env.REACT_APP_IMAGE_URL}/${row.image}`}
                     sx={{
                         width: '40px',
                         height: '40px',
@@ -40,95 +44,25 @@ const columns = [
     {
         field: 'phone',
         title: 'Phone',
-        width: '15%',
+        width: '14%',
     },
     {
         field: 'address',
         title: 'Address',
-        width: '25%',
-    }
-];
-
-const rows = [
-    {
-        id: '1',
-        email: 'lechinhtue@gmail.com',
-        name: 'Lê Chính Tuệ',
-        image: 'http://dotshop69.000webhostapp.com/Public/images/tue.png',
-        phone: '0596181641',
-        address: 'dhsp tphcm aa'
+        width: '14%',
     },
     {
-        id: '2',
-        email: 'lechinhtue@gmail.com',
-        name: 'Lê Chính Tuệ',
-        image: 'http://dotshop69.000webhostapp.com/Public/images/tue.png',
-        phone: '0586181641',
-        address: 'dhsp tphcm'
+        field: 'role',
+        title: 'Role',
+        width: '14%',
     },
     {
-        id: '3',
-        email: 'lechinhtue@gmail.com',
-        name: 'Lê Chính Tuệ',
-        image: 'http://dotshop69.000webhostapp.com/Public/images/tue.png',
-        phone: '0586181641',
-        address: 'dhsp tphcm'
-    },
-    {
-        id: '4',
-        email: 'lechinhtue@gmail.com',
-        name: 'Lê Chính Tuệ',
-        image: 'http://dotshop69.000webhostapp.com/Public/images/tue.png',
-        phone: '0586181641',
-        address: 'dhsp tphcm'
-    },
-    {
-        id: '5',
-        email: 'lechinhtue@gmail.com',
-        name: 'Lê Chính Tuệ',
-        image: 'http://dotshop69.000webhostapp.com/Public/images/tue.png',
-        phone: '0586181641',
-        address: 'dhsp tphcm'
-    },
-    {
-        id: '6',
-        email: 'lechinhtue@gmail.com',
-        name: 'Lê Chính Tuệ',
-        image: 'http://dotshop69.000webhostapp.com/Public/images/tue.png',
-        phone: '0586181641',
-        address: 'dhsp tphcm'
-    },
-    {
-        id: '7',
-        email: 'lechinhtue@gmail.com',
-        name: 'Lê Chính Tuệ',
-        image: 'http://dotshop69.000webhostapp.com/Public/images/tue.png',
-        phone: '0586181641',
-        address: 'dhsp tphcm'
-    },
-    {
-        id: '8',
-        email: 'lechinhtue@gmail.com',
-        name: 'Lê Chính Tuệ',
-        image: 'http://dotshop69.000webhostapp.com/Public/images/tue.png',
-        phone: '0586181641',
-        address: 'dhsp tphcm'
-    },
-    {
-        id: '9',
-        email: 'lechinhtue@gmail.com',
-        name: 'Lê Chính Tuệ',
-        image: 'http://dotshop69.000webhostapp.com/Public/images/tue.png',
-        phone: '0586181641',
-        address: 'dhsp tphcm'
-    },
-    {
-        id: '10',
-        email: 'lechinhtue@gmail.com',
-        name: 'Lê Chính Tuệ',
-        image: 'http://dotshop69.000webhostapp.com/Public/images/tue.png',
-        phone: '0586181641',
-        address: 'dhsp tphcm'
+        field: 'createdAt',
+        title: 'Created At',
+        width: '14%',
+        render: row => (
+            <Typography variant='body2'>{fDate(row.createdAt)}</Typography>
+        )
     }
 ];
 
@@ -141,38 +75,52 @@ const options = {
 
 const AccountList = () => {
     const navigate = useNavigate();
+    const [accounts, setAccounts] = useState(null);
+    useEffect(() => {
+        const getAccounts = async () => {
+            const accounts = await accountApi.findAll();
+            console.log(accounts);
+            setAccounts(accounts);
+        }
+        getAccounts();
+    }, []);
     return (
-        <MaterialTable
-            title='Account'
-            columns={columns}
-            data={rows}
-            options={options}
-            actions={[
-                {
-                    icon: () => <Edit color='warning' />,
-                    tooltip: 'Xem và sửa',
-                    onClick: (event, row) => navigate(`/account/${row.email}`),
-                    position: 'row'
-                },
-                {
-                    icon: () => <Delete color='error' />,
-                    tooltip: 'Delete',
-                    onClick: (event, rowData) => alert("You want to delete " + rowData.name),
-                    position: 'row'
-                },
-                {
-                    icon: () => <AddCircle color='success' />,
-                    tooltip: 'Thêm',
-                    isFreeAction: true,
-                    onClick: () => navigate(PATH_DASHBOARD.account.create)
-                },
-                {
-                    icon: () => <Delete color='error' />,
-                    tooltip: 'Remove All Selected Users',
-                    onClick: (evt, data) => alert('You want to delete rows')
-                }
-            ]}
-        />
+        <>
+            {accounts && (
+                <MaterialTable
+                    title='Account'
+                    columns={columns}
+                    data={accounts}
+                    options={options}
+                    actions={[
+                        {
+                            icon: () => <Edit color='warning' />,
+                            tooltip: 'Xem và sửa',
+                            onClick: (event, row) => navigate(`/account/${row.email}`),
+                            position: 'row'
+                        },
+                        {
+                            icon: () => <Delete color='error' />,
+                            tooltip: 'Delete',
+                            onClick: (event, rowData) => alert("You want to delete " + rowData.name),
+                            position: 'row'
+                        },
+                        {
+                            icon: () => <AddCircle color='success' />,
+                            tooltip: 'Thêm',
+                            isFreeAction: true,
+                            onClick: () => navigate(PATH_DASHBOARD.account.create)
+                        },
+                        {
+                            icon: () => <Delete color='error' />,
+                            tooltip: 'Remove All Selected Users',
+                            onClick: (evt, data) => alert('You want to delete rows')
+                        }
+                    ]}
+                />
+            )}
+            {!accounts && "Loading..."}
+        </>
     );
 };
 

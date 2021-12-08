@@ -1,25 +1,45 @@
-import { Grid, Stack, Card, Typography, TextField, FormHelperText } from '@mui/material';
+import { Grid, Stack, Card, Typography, TextField, FormHelperText,MenuItem } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { FormikProvider, Form, useFormik } from 'formik';
-
 // apis
 import accountApi from '../../apis/accountApi';
 // upload
 import UploadSingleFile from '../upload/UploadSingleFile';
-
+// utils
+import { createAccountSchema } from '../../utils/yupSchemas';
+const roles = [
+    {
+        value: 'Admin',
+    },
+    {
+        value: 'User',
+    },
+    {
+        value: 'Block',
+    }
+];
 const AccountForm = () => {
     const formik = useFormik({
         initialValues: {
-            name: '',
+            email: '',
+            password: '',
+            name:'',
             image: null,
-            subtitle: ''
+            phone:'',
+            address:'',
+            role:'',
         },
+        validationSchema : createAccountSchema,
         onSubmit: async (values, { resetForm }) => {
-            const { name, image, subtitle } = values;
+            const { email, password, name, image, phone, address, role } = values;
             var formData = new FormData();
+            formData.append('email', email);
+            formData.append('password', password);
             formData.append('name', name);
             formData.append('image', image.file);
-            formData.append('subtitle', subtitle);
+            formData.append('phone', phone);
+            formData.append('address', address);
+            formData.append('role', role);
             const res = await accountApi.insert(formData);
             console.log(res);
             resetForm();
@@ -84,12 +104,20 @@ const AccountForm = () => {
                     <Grid item xs={12} md={8}>
                         <Card sx={{ p: 3 }}>
                             <Stack spacing={3}>
-                            <TextField
+                                <TextField
                                     fullWidth
                                     label='Email'
                                     {...getFieldProps('email')}
                                     error={Boolean(touched.email && errors.email)}
                                     helperText={touched.email && errors.email}
+                                />
+                                <TextField
+                                    fullWidth
+                                    type='password'
+                                    label='Password'
+                                    {...getFieldProps('password')}
+                                    error={Boolean(touched.password && errors.password)}
+                                    helperText={touched.password && errors.password}
                                 />
                                 <TextField
                                     fullWidth
@@ -112,6 +140,21 @@ const AccountForm = () => {
                                     error={Boolean(touched.address && errors.address)}
                                     helperText={touched.address && errors.address}
                                 />
+                                <TextField
+                                    fullWidth
+                                    label='Role'
+                                    select
+                                    value={roles}
+                                    {...getFieldProps('role')}
+                                    error={Boolean(touched.role && errors.role)}
+                                    helperText={touched.role && errors.role}
+                                >
+                                    {roles.map((option) => (
+                                        <MenuItem key={option.value} value={option.value}>
+                                            {option.value}
+                                        </MenuItem>
+                                    ))}
+                                </TextField>
                                 <Stack alignItems='end'>
                                     <LoadingButton type='submit' variant='contained' loading={isSubmitting}>
                                         Save
