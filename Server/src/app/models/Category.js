@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const mongooseDelete = require('mongoose-delete');
 const AutoIncrement = require('mongoose-sequence')(mongoose);
 const slug = require('mongoose-slug-generator');
 const Schema = mongoose.Schema;
@@ -42,4 +43,9 @@ const Category = new Schema({
 mongoose.plugin(slug);
 Category.plugin(AutoIncrement);
 
+Category.plugin(mongooseDelete,{
+    deletedAt: true,
+    deletedBy: true,
+    overrideMethods: true
+});
 module.exports = mongoose.model('Category', Category);
