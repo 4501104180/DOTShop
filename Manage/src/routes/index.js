@@ -41,7 +41,7 @@ const Router = () => {
                         { path: '', element: <Navigate to='/account/list' replace /> },
                         { path: 'list', element: <Accounts /> },
                         { path: 'new', element: <AccountCreate /> },
-                        { path: ':emailAccount', element: <AccountDetail /> },
+                        { path: 'edit/:accountId', element: <AccountCreate /> },
                     ]
                 },
                 {
@@ -71,7 +71,6 @@ const CategoryStyles = Loadable(lazy(() => import('../pages/category/CategorySty
 // Account
 const Accounts = Loadable(lazy(() => import('../pages/account/Accounts')));
 const AccountCreate = Loadable(lazy(() => import('../pages/account/AccountCreate')));
-const AccountDetail = Loadable(lazy(() => import('../pages/account/AccountDetail')));
 
 // Product
 const Products = Loadable(lazy(() => import('../pages/product/Products')));

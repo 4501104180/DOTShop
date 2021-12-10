@@ -1,5 +1,5 @@
 export const fDate = stringDate => {
-    const location = 'vi-VN';
+    const location = 'en-US';
     const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
     const date = new Date(stringDate);
     const time = date.toLocaleTimeString(location);

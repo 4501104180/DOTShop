@@ -25,6 +25,17 @@ class AccountsAPI {
         }
     };
 
+    async findById(req,res) {
+        try {
+            const { accountID } = req.params;
+            const account = await Account
+                .findOne({ _id:accountID })
+            res.json(account);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
     // [GET] /accounts/profile
     async getProfile(req, res) {
         const account = await Account
@@ -103,20 +114,36 @@ class AccountsAPI {
     // [POST] /accounts
     async insert(req, res) {
         try {
-            const { email, password } = req.body;
-            const accountExisted = await Account.findOne({ email: email });
-            if (accountExisted) {
-                res.statusMessage = 'This account already exists!';
-                res.status(400).end();
-                return;
-            }
+            
+            const { password } = req.body; 
             const saltRounds = 10;
             const hashedPassword = await bcrypt.hash(password, saltRounds);
+            const { email, ...accountBody } = req.body;
+            const accountExisted = await Account.findOne({ email: email });
+            if (accountExisted) {
+                res.json({
+                    statusText: 'error',
+                    message: 'Account is existed'
+                });
+                console.log('error');
+                return;
+            }
+            const isDeleted = await Account
+                .findOneDeleted({email: email});
+            if(isDeleted) {
+                res.json({
+                    statusText: 'info',
+                    message: 'Account is existed in recycle bin',
+                    account: isDeleted
+                });
+                return;
+            }
             const account = new Account({
-                ...req.body,
+                ...accountBody,
+                email,
                 password: hashedPassword,
                 image: req.file.originalname
-            })
+            });
             await account.save();
             res.json({
                 message: 'Insert successfully!',
@@ -129,16 +156,26 @@ class AccountsAPI {
     // [PUT] /accounts/:accountID
     async edit(req, res) {
         try {
-            const { password } = req.body;
+            const { accountID } = req.params;
+            const { email, image, password, ...newBody } = req.body;
             const saltRounds = 10;
             const hashedPassword = await bcrypt.hash(password, saltRounds);
-            const { accountID } = req.params;
-            const result = await Account.findByIdAndUpdate(accountID, {
-                ...req.body,
+            const body = {
+                ...newBody
+            };
+            if (req.file) {
+                body.image = req.file.originalname
+            }
+            const _account = await Account
+                .findByIdAndUpdate(accountID, body, {
+                account: true,
                 password: hashedPassword,
-                image: req.file.originalname
             })
-            res.json(result);
+            res.json({
+                statusText: 'Success',
+                message: 'Edit Success',
+                account: _account
+            });
         } catch (error) {
             console.log(error);
         };
@@ -159,16 +196,31 @@ class AccountsAPI {
         };
     };
 
+    // [PATCH] /accounts/:accountID
+    async restoreByID(req,res){
+        try {
+            const { accountID } = req.params;
+            const restoredItem = await Account
+                .restore({_id: accountID});
+            res.json({
+                statusText: 'success',
+                message: 'Restore successfully'
+            })
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
     // [DELETE] /accounts/
-    async deletedAll(req, res) {
+     async deletedAll(req, res) {
         try {
             const deletor = mongoose.Types.ObjectId("61af7d561ab0c6ea12eaa560");
-            const { accounts } = req.body;
+            const { accountIDs } = req.body;
             const result = await Account
-            .delete({ _id: { $in: accounts }}, deletor );
+            .delete({ _id: { $in: accountIDs }}, deletor );
                 res.json({
                     ...result,
-                    accounts
+                    accountIDs
                 });
         } catch (error) {
             console.log(error);

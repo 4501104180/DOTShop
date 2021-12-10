@@ -26,4 +26,7 @@ export const createAccountSchema = yup.object().shape({
     phone: yup
         .string()
         .max(10, 'Max is 10 numbers'),
+    role: yup
+        .string()
+        .required('Not be empty!'),
 });

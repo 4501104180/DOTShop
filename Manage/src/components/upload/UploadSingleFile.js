@@ -54,7 +54,7 @@ const UploadSingleFile = ({ file, caption, sx, ...other }) => {
                         <Box
                             component='img'
                             alt='Image project'
-                            src={typeof file === 'string' ? file : file.preview}
+                            src={typeof file === 'string' ? `${process.env.REACT_APP_IMAGE_URL}/${file}` : file.preview}
                             sx={{ zIndex: 8, objectFit: 'cover' }}
                         />
                     )}

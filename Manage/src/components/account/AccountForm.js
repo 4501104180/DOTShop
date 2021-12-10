@@ -1,33 +1,40 @@
-import { Grid, Stack, Card, Typography, TextField, FormHelperText,MenuItem } from '@mui/material';
+import PropTypes from 'prop-types';
+import { Grid, Stack, Card, Typography, TextField, FormHelperText,MenuItem, Alert } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { FormikProvider, Form, useFormik } from 'formik';
+import { useNavigate } from 'react-router-dom';
+import { useConfirm } from 'material-ui-confirm';
 // apis
 import accountApi from '../../apis/accountApi';
 // upload
 import UploadSingleFile from '../upload/UploadSingleFile';
+
 // utils
 import { createAccountSchema } from '../../utils/yupSchemas';
+
+// path
+import { PATH_DASHBOARD } from '../../routes/path';
+
+const propTypes = {
+    isEdit: PropTypes.bool,
+    account: PropTypes.object
+};
 const roles = [
-    {
-        value: 'Admin',
-    },
-    {
-        value: 'User',
-    },
-    {
-        value: 'Block',
-    }
+    { value: 'Admin'}, { value: 'User'}, {value: 'Block'}
 ];
-const AccountForm = () => {
+const AccountForm = ({isEdit, account}) => {
+    const confirm = useConfirm();
+    const navigate = useNavigate();
     const formik = useFormik({
+        enableReinitialize: true,
         initialValues: {
-            email: '',
-            password: '',
-            name:'',
-            image: null,
-            phone:'',
-            address:'',
-            role:'',
+            email: account?.email || '',
+            password: account?.password || '',
+            name: account?.name || '',
+            image: account?.image || null,
+            phone: account?.phone || '',
+            address: account?.address || '',
+            role: account?.role || '',
         },
         validationSchema : createAccountSchema,
         onSubmit: async (values, { resetForm }) => {
@@ -40,9 +47,41 @@ const AccountForm = () => {
             formData.append('phone', phone);
             formData.append('address', address);
             formData.append('role', role);
-            const res = await accountApi.insert(formData);
-            console.log(res);
-            resetForm();
+            let res = null;
+            if (isEdit) {
+                res = await accountApi.edit(account._id, formData);
+                navigate(PATH_DASHBOARD.account.list);
+            } else {
+                res = await accountApi.insert(formData);
+                resetForm();
+            }
+            let { statusText, message } = res;
+            // account in recycle bin
+            if(statusText === 'info'){
+                try {
+                    await confirm({
+                        title: message,
+                        content: <Alert severity={statusText}>Do you want to restore this Account ?</Alert>
+                    });
+                    const deletedItem = res.account;
+                    const restore = await accountApi.restoreByID(deletedItem._id);
+                    statusText = restore.statusText;
+                    message = restore.message;
+                    navigate(PATH_DASHBOARD.account.list);
+                } catch (error) {
+                    return;
+                }
+            }
+            if(statusText === 'error'){
+                try {
+                    await confirm({
+                        title: message,
+                        content: <Alert severity={statusText}>This account is existed</Alert>
+                    });
+                } catch (error) {
+                    return;
+                }
+            }
         }
     });
     const { values, setFieldValue, getFieldProps, isSubmitting, touched, errors } = formik;
@@ -157,7 +196,7 @@ const AccountForm = () => {
                                 </TextField>
                                 <Stack alignItems='end'>
                                     <LoadingButton type='submit' variant='contained' loading={isSubmitting}>
-                                        Save
+                                        {isEdit ? 'Change' : 'Save'}
                                     </LoadingButton>
                                 </Stack>
                             </Stack>
