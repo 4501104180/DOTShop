@@ -50,6 +50,15 @@ const Router = () => {
             { path: "edit/:slugProduct", element: <ProductCreate /> },
           ],
         },
+        {
+          path: "bill",
+          children: [
+            { path: "", element: <Navigate to="/bill/list" replace /> },
+            { path: "list", element: <Bills /> },
+            { path: "new", element: <BillCreate /> },
+            { path: ":billID", element: <BillCreate /> },
+          ],
+        },
       ],
     },
   ]);
@@ -73,4 +82,9 @@ const AccountCreate = Loadable(
 const Products = Loadable(lazy(() => import("../pages/product/Products")));
 const ProductCreate = Loadable(
   lazy(() => import("../pages/product/ProductCreate"))
+);
+// Bill
+const Bills = Loadable(lazy(() => import("../pages/bill/Biils")));
+const BillCreate = Loadable(
+  lazy(() => import("../pages/bill/BillCreate"))
 );
