@@ -57,8 +57,8 @@ const UploadMultipleFile = ({ files, showPreview = false, onRemove, onRemoveAll,
                 }}
                 >
                     <Typography variant='body2' sx={{ color: 'text.secondary' }}>
-                    Drag and drop image here or&nbsp;
-                        <Link underline='always'>Choose</Link>&nbsp;from device
+                        Drag image here or&nbsp;
+                        <Link underline='always'>Choose</Link>&nbsp; from device
                     </Typography>
                 </Box>
             </DropZoneStyle>
@@ -149,7 +149,7 @@ const UploadMultipleFile = ({ files, showPreview = false, onRemove, onRemoveAll,
                         onClick={onRemoveAll}
                         sx={{ mr: 1.5 }}
                     >
-                        RemoveAll
+                        Remove all
                     </Button>
                 </Stack>
             )}

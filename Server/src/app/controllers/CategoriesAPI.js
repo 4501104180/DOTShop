@@ -5,7 +5,7 @@ class CategoriesAPI {
     async findAll(req, res) {
         try {
             const categories = await Category
-                .find({ status: 'active' })
+                .find({})
                 .sort({ 'displayOrder': 1 });
             res.json(categories);
         } catch (error) {
@@ -55,15 +55,48 @@ class CategoriesAPI {
             console.log(error);
         }
     };
+    // async findBySlug(req, res) {
+    //     try {
+    //         const { slugProduct } = req.params;
+    //         const product = await Product
+    //             .findOne({
+    //                 slug: slugProduct,
+    //             });
+    //         res.json(product);
+    //     } catch (error) {
+    //         console.log(error);
+    //     }
+    // };
     // [POST] /categories
     async insertCategory(req, res) {
-        const banners = req.files['banners'].map( file => file.originalname );
         try {
+            const banners = req.files['banners'].map( file => file.originalname );
+            const image = req.files['image'][0].originalname;
+            const { title, ...categoryBody } = req.body;
+            const categoryExisted = await Category.findOne({ title: title });
+            if (categoryExisted) {
+                res.json({
+                    statusText: 'error',
+                    message: 'Category is existed'
+                });
+                console.log('error');
+                return;
+            }
+            const isDeleted = await Category
+                .findOneDeleted({title: title});
+            if(isDeleted) {
+                res.json({
+                    statusText: 'info',
+                    message: 'Category is existed in recycle bin',
+                    category: isDeleted
+                });
+                return;
+            }
             const category = new Category({
-                ...req.body,
-                image:req.files['image'][0].originalname,
+                ...categoryBody,
+                title,
+                image,
                 banners
-
             });
             await category.save();
             res.json({
@@ -76,15 +109,31 @@ class CategoriesAPI {
     };
      // [PUT] /categories/: categoryID
      async editCategoryById(req, res) {
-        const banners = req.files['banners'].map( file => file.originalname );
         try { 
             const { categoryID } = req.params;
-            const result = await Category.findByIdAndUpdate(categoryID, {
+           // const banners = req.files['banners'].map( file => file.originalname );
+            const { title, image, banners, ...newBody } = req.body;
+            const body = {
                 ...req.body,
-                image:req.files['image'][0].originalname,
-                banners
+            };    
+            if (req.files) {
+                body.image = req.files['image'][0].originalname;
+                body.banners = req.files['banners'].map( file => file.originalname );
+            }
+            if (title) {
+                const category = await Category.findById(categoryID);
+                category.title = title;
+                await category.save();
+            }
+            const _category = await Category.findByIdAndUpdate(categoryID, body, {
+                category:true,
+                
             })
-            res.json(result);
+            res.json({
+                category: _category,
+                status: "success",
+                message: "Edit Category successfully!",
+            });
         } catch (error) {
             console.log(error);
         };
@@ -109,17 +158,30 @@ class CategoriesAPI {
     async deletedCategoryAll(req, res) {
         try {
             const deletor = mongoose.Types.ObjectId("61af7d561ab0c6ea12eaa560");
-            const { categories } = req.body;
+            const { categoryIDs } = req.body;
             const result = await Category
-            .delete({ _id: { $in: categories }}, deletor );
+            .delete({ _id: { $in: categoryIDs }}, deletor );
                 res.json({
                     ...result,
-                    categories
+                    categoryIDs
                 });
         } catch (error) {
             console.log(error);
         };
     };
+    // [PATCH] /products/:productID
+    async restoreByID(req, res) {
+        try {
+        const { categoryID } = req.params;
+        const restoredItem = await Category.restore({ _id: categoryID });
+        res.json({
+            statusText: "success",
+            message: "Restore successfully",
+        });
+        } catch (error) {
+        console.log(error);
+        }
+    }
 };
 
 module.exports = new CategoriesAPI;

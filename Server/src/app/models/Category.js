@@ -32,12 +32,9 @@ const Category = new Schema({
         type: Array,
         default: []
     },
-    status: {
-        type: String,
-        default: 'active'
-    }
 }, {
-    _id: false
+    _id: false,
+    timestamps: true
 });
 
 mongoose.plugin(slug);

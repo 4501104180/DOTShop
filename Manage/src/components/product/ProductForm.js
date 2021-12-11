@@ -48,7 +48,7 @@ const ProductForm = ({ isEdit, product }) => {
       VATFee: product?.VATFee || "",
       limit: product?.limit || "",
     },
-    //validationSchema: createProductSchema,
+    validationSchema: createProductSchema,
     onSubmit: async (values, { resetForm }) => {
       const {
         name,

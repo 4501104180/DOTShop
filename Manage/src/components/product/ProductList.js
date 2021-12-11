@@ -103,7 +103,7 @@ const ProductList = () => {
         },
       });
       const res = await productApi.deleteProductById(_productID);
-      const { statusText, message, productID } = res;
+      const { productID } = res;
       const newProduct = products.filter(_product => _product._id !== productID);
       setProducts(newProduct);
     } catch (error) {
@@ -121,7 +121,7 @@ const ProductList = () => {
         });
         const deleteIds = _data.map(item => item._id);
         const res = await productApi.deletedProductAll(deleteIds);
-        const { statusText, message, productIDs } = res;
+        const { productIDs } = res;
         const newProduct = products.filter(_product => !productIDs.includes(_product._id));
         setProducts(newProduct);
     } catch (error) {
