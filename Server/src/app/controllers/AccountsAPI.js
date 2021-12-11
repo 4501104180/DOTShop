@@ -25,11 +25,11 @@ class AccountsAPI {
         }
     };
 
-    async findById(req,res) {
+    async findById(req, res) {
         try {
             const { accountID } = req.params;
             const account = await Account
-                .findOne({ _id:accountID })
+                .findOne({ _id: accountID })
             res.json(account);
         } catch (error) {
             console.log(error);
@@ -42,6 +42,19 @@ class AccountsAPI {
             .findOne({ _id: req.user._id });
         const { password, ...user } = account.toObject();
         res.json(user);
+    };
+
+    // [PATCH] /accounts/profile
+    async editProfile(req, res) {
+        const account = await Account
+            .findByIdAndUpdate(req.user._id, req.body, {
+                new: true
+            });
+        res.json({
+            statusText: 'success',
+            message: 'Update profile successfully!',
+            account
+        });
     };
 
     // [POST] /accounts/login
@@ -114,8 +127,8 @@ class AccountsAPI {
     // [POST] /accounts
     async insert(req, res) {
         try {
-            
-            const { password } = req.body; 
+
+            const { password } = req.body;
             const saltRounds = 10;
             const hashedPassword = await bcrypt.hash(password, saltRounds);
             const { email, ...accountBody } = req.body;
@@ -129,8 +142,8 @@ class AccountsAPI {
                 return;
             }
             const isDeleted = await Account
-                .findOneDeleted({email: email});
-            if(isDeleted) {
+                .findOneDeleted({ email: email });
+            if (isDeleted) {
                 res.json({
                     statusText: 'info',
                     message: 'Account is existed in recycle bin',
@@ -168,9 +181,9 @@ class AccountsAPI {
             }
             const _account = await Account
                 .findByIdAndUpdate(accountID, body, {
-                account: true,
-                password: hashedPassword,
-            })
+                    account: true,
+                    password: hashedPassword,
+                })
             res.json({
                 statusText: 'Success',
                 message: 'Edit Success',
@@ -186,22 +199,22 @@ class AccountsAPI {
             const deletor = mongoose.Types.ObjectId("61af7d561ab0c6ea12eaa560");
             const { accountID } = req.params;
             const result = await Account
-            .delete({ _id: accountID }, deletor );
-                res.json({
-                    ...result,
-                    accountID
-                });
+                .delete({ _id: accountID }, deletor);
+            res.json({
+                ...result,
+                accountID
+            });
         } catch (error) {
             console.log(error);
         };
     };
 
     // [PATCH] /accounts/:accountID
-    async restoreByID(req,res){
+    async restoreByID(req, res) {
         try {
             const { accountID } = req.params;
             const restoredItem = await Account
-                .restore({_id: accountID});
+                .restore({ _id: accountID });
             res.json({
                 statusText: 'success',
                 message: 'Restore successfully'
@@ -212,16 +225,16 @@ class AccountsAPI {
     }
 
     // [DELETE] /accounts/
-     async deletedAll(req, res) {
+    async deletedAll(req, res) {
         try {
             const deletor = mongoose.Types.ObjectId("61af7d561ab0c6ea12eaa560");
             const { accountIDs } = req.body;
             const result = await Account
-            .delete({ _id: { $in: accountIDs }}, deletor );
-                res.json({
-                    ...result,
-                    accountIDs
-                });
+                .delete({ _id: { $in: accountIDs } }, deletor);
+            res.json({
+                ...result,
+                accountIDs
+            });
         } catch (error) {
             console.log(error);
         };
