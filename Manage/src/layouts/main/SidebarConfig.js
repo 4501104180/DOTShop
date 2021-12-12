@@ -13,7 +13,7 @@ const ICONS = {
     category: <Category />,
     account: <AssignmentInd />,
     product: <ProductionQuantityLimits />,
-    bill: <AttachMoney />
+    order: <AttachMoney />
 };
 
 const SIDEBAR_CONFIG = [
@@ -58,12 +58,11 @@ const SIDEBAR_CONFIG = [
                 ]
             },
             {
-                title: 'bill',
-                path: PATH_DASHBOARD.bill.root,
-                icon: ICONS.bill,
+                title: 'order',
+                path: PATH_DASHBOARD.order.root,
+                icon: ICONS.order,
                 children: [
-                    { title: 'list', path: PATH_DASHBOARD.bill.list },
-                    { title: 'create', path: PATH_DASHBOARD.bill.create }
+                    { title: 'list', path: PATH_DASHBOARD.order.list }
                 ]
             }
         ]

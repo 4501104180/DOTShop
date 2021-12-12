@@ -3,25 +3,24 @@ import { Container } from '@mui/material';
 // components
 import Page from '../../components/Page';
 import HeaderBreadcrumbs from '../../components/HeaderBreadcrumbs';
-import { BillForm } from '../../components/bill';
+import { OrderList } from '../../components/order';
 // path
 import { PATH_DASHBOARD } from '../../routes/path';
 
-const BillCreate = () => {
+const Orders = () => {
     return (
-        <Page title='Check Bill'>
+        <Page title='Bills'>
             <Container sx={{ pb: 3 }}>
                 <HeaderBreadcrumbs
-                    header='Check Bill'
+                    header='Bills'
                     links={[
                         { name: 'Dashboard', href: PATH_DASHBOARD.root },
-                        { name: 'Bills', href: PATH_DASHBOARD.bill.list },
                     ]}
                 />
-                <BillForm />
+                <OrderList />
             </Container>
         </Page>
     );
 };
 
-export default BillCreate;
+export default Orders;

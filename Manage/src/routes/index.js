@@ -51,12 +51,11 @@ const Router = () => {
           ],
         },
         {
-          path: "bill",
+          path: "order",
           children: [
-            { path: "", element: <Navigate to="/bill/list" replace /> },
-            { path: "list", element: <Bills /> },
-            { path: "new", element: <BillCreate /> },
-            { path: ":billID", element: <BillCreate /> },
+            { path: "", element: <Navigate to="/order/list" replace /> },
+            { path: "list", element: <Orders /> },
+            { path: ":orderId", element: <OrderDetail /> }
           ],
         },
       ],
@@ -83,8 +82,6 @@ const Products = Loadable(lazy(() => import("../pages/product/Products")));
 const ProductCreate = Loadable(
   lazy(() => import("../pages/product/ProductCreate"))
 );
-// Bill
-const Bills = Loadable(lazy(() => import("../pages/bill/Biils")));
-const BillCreate = Loadable(
-  lazy(() => import("../pages/bill/BillCreate"))
-);
+// Order
+const Orders = Loadable(lazy(() => import("../pages/order/Orders")));
+const OrderDetail = Loadable(lazy(() => import("../pages/order/OrderDetail")));
