@@ -9,7 +9,8 @@ import { getCart, deleteCart } from '../redux/slices/cart';
 
 const initialState = {
     isInitialized: false,
-    isAuthenticated: false
+    isAuthenticated: false,
+    role: ''
 };
 
 const handlers = {
@@ -21,10 +22,11 @@ const handlers = {
             isInitialized: true
         }
     },
-    LOGIN: (state) => {
+    LOGIN: (state, action) => {
         return {
             ...state,
-            isAuthenticated: true
+            isAuthenticated: true,
+            role: action.payload
         }
     },
     LOGOUT: (state) => {
@@ -71,13 +73,18 @@ const AuthProvider = ({ children }) => {
         initialize();
     }, [dispatchSlice]);
     const login = async (email, password) => {
-        const tokens = await accountApi.login(email, password);
+        const res = await accountApi.login(email, password);
+        const { role, tokens } = res;
         setToken(tokens);
-        await dispatchSlice(getProfile());
-        await dispatchSlice(getCart());
+        if (role !== 'Admin') {
+            await dispatchSlice(getProfile());
+            await dispatchSlice(getCart());
+        }
         dispatch({
-            type: 'LOGIN'
+            type: 'LOGIN',
+            role
         });
+        return role;
     };
     const register = async (name, email, password, passwordConfirm) => {
         return await accountApi.register(name, email, password, passwordConfirm);

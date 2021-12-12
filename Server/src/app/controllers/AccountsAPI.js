@@ -78,11 +78,14 @@ class AccountsAPI {
                 res.status(400).end();
                 return;
             }
-            const { _id } = account;
-            const tokens = generateToken({ _id });
+            const { _id, role } = account;
+            const tokens = generateToken({ _id, role });
             account.refreshToken = tokens.refreshToken;
             await account.save();
-            res.json(tokens);
+            res.json({
+                role,
+                tokens
+            });
         } catch (error) {
             console.log(error);
         };
@@ -250,8 +253,8 @@ class AccountsAPI {
                     refreshToken
                 });
             if (!account) return res.sendStatus(403);
-            const { _id } = account;
-            const tokens = generateToken({ _id });
+            const { _id, role } = account;
+            const tokens = generateToken({ _id, role });
             account.refreshToken = tokens.refreshToken;
             await account.save();
             res.json(tokens);

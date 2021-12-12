@@ -2,6 +2,8 @@ const path = (root, sublink) => {
     return `${root}${sublink}`;
 };
 
+export const ROOT_EXTERNAL = process.env.REACT_APP_CLIENT_URL;
+
 const ROOT_DASHBOARD = '/dashboard';
 const ROOT_CATEGORY = '/category';
 const ROOT_ACCOUNT = '/account';

@@ -4,9 +4,10 @@ import { LoadingButton } from '@mui/lab';
 import { Formik, Form, FastField } from 'formik';
 
 import useAuth from '../../../hooks/useAuth';
-import { PATH_PAGE } from '../../../routes/path';
 import { InputField } from '../../custom-field';
 import { loginSchema } from '../../../utils/yupSchema';
+// path
+import { PATH_PAGE, ROOT_EXTERNAL } from '../../../routes/path';
 
 const LoginForm = () => {
     const history = useHistory();
@@ -18,7 +19,11 @@ const LoginForm = () => {
     };
     const handleSubmit = async (values, { setErrors, resetForm }) => {
         try {
-            await login(values.email, values.password);
+            const role = await login(values.email, values.password);
+            if (role === 'Admin') {
+                window.location.href = ROOT_EXTERNAL;
+                return;
+            }
             const path = state?.from ? state.from : PATH_PAGE.home;
             history.replace(path);
         } catch (error) {

@@ -1,11 +1,15 @@
 import PropTypes from 'prop-types';
+import Cookies from 'js-cookie';
 import { styled, alpha } from '@mui/material/styles';
 import { Box, Stack, AppBar, Toolbar, IconButton } from '@mui/material';
-import { ListOutlined, ZoomOutMap } from '@mui/icons-material';
+import { ListOutlined, ZoomOutMap, Logout } from '@mui/icons-material';
 
+// apis
+import axiosInstance from '../../apis/axiosInstance';
 // components
 import Hidden from '../../components/Hidden';
-import AvatarBadge from '../../components/AvatarBadge';
+// path
+import { ROOT_EXTERNAL } from '../../routes/path';
 // 
 import NotificationsPopover from './NotificationsPopover';
 
@@ -18,6 +22,11 @@ const propTypes = {
 };
 
 const MainAppbar = ({ onOpenSidebar }) => {
+    const handleLogout = () => {
+        Cookies.remove('accessToken');
+        delete axiosInstance.defaults.headers.common['Authorization'];
+        window.location.href = `${ROOT_EXTERNAL}/auth/login`;
+    };
     return (
         <RootStyle>
             <ToolbarStyle>
@@ -36,16 +45,9 @@ const MainAppbar = ({ onOpenSidebar }) => {
                         <ZoomOutMap />
                     </IconButton>
                     <NotificationsPopover />
-                    <AvatarBadge
-                        status='online'
-                        src='Lê Chính Tuệ'
-                        image='http://dotshop69.000webhostapp.com/Public/images/tue.png'
-                        sx={{
-                            width: '50px',
-                            height: '50px',
-                            cursor: 'pointer'
-                        }}
-                    />
+                    <IconButton color='error' onClick={handleLogout}>
+                        <Logout />
+                    </IconButton>
                 </Stack>
             </ToolbarStyle>
         </RootStyle>
