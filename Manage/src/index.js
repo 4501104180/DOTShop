@@ -9,17 +9,22 @@ import { BrowserRouter } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ConfirmProvider } from "material-ui-confirm";
+import { Provider as ReduxProvider } from 'react-redux';
+
+import { store } from './redux/store';
 
 ReactDOM.render(
   <React.StrictMode>
     <HelmetProvider>
-      <ConfirmProvider>
-        <AuthProvider>
-          <BrowserRouter>
-            <App />
-          </BrowserRouter>
-        </AuthProvider>
-      </ConfirmProvider>
+      <ReduxProvider store={store}>
+        <ConfirmProvider>
+          <AuthProvider>
+            <BrowserRouter>
+              <App />
+            </BrowserRouter>
+          </AuthProvider>
+        </ConfirmProvider>
+      </ReduxProvider>
     </HelmetProvider>
   </React.StrictMode>,
   document.getElementById("root")
