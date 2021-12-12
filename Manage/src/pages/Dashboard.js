@@ -7,7 +7,7 @@ import {
     TotalActiveAccounts,
     TotalActiveTeams
 } from '../components/dashboard';
-
+import Charts from '../components/dashboard/Charts'
 const Team = () => {
     return (
         <Page title='Dashboard'>
@@ -15,7 +15,7 @@ const Team = () => {
                 <Typography gutterBottom variant='h5' sx={{ mb: 2 }}>
                     Welcome back, Pihe!
                 </Typography>
-                <Grid container spacing={3}>
+                <Grid container spacing={3} mb={5} >
                     <Grid item xs={12} md={4}>
                         <TotalActiveCategories />
                     </Grid>
@@ -26,6 +26,7 @@ const Team = () => {
                         <TotalActiveTeams />
                     </Grid>
                 </Grid>
+                <Charts />
             </Container>
         </Page>
     );

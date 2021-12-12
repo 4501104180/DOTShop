@@ -162,6 +162,7 @@ class AccountsAPI {
             });
             await account.save();
             res.json({
+                statusText: 'success',
                 message: 'Insert successfully!',
                 account
             });
@@ -188,7 +189,7 @@ class AccountsAPI {
                     password: hashedPassword,
                 })
             res.json({
-                statusText: 'Success',
+                statusText: 'success',
                 message: 'Edit Success',
                 account: _account
             });
