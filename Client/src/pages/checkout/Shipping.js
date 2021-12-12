@@ -1,29 +1,40 @@
 import { styled } from '@mui/material/styles';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useLocation } from 'react-router-dom';
 import { Container, Stack, Typography, Link } from '@mui/material';
+import { useSelector } from 'react-redux';
 
+// components
 import Page from '../../components/Page';
-import { PATH_CHECKOUT } from '../../routes/path';
+import { ShippingForm } from '../../components/checkout';
+// path
+import { PATH_CHECKOUT, PATH_PAGE } from '../../routes/path';
 
 const Shipping = () => {
+    const queries = new URLSearchParams(useLocation().search);
+    const isIntendingCart = queries.get('isIntendingCart');
+    const { user } = useSelector(state => state.user);
+    const isFilledInfor = user.phone !== '' || user.address !== '';
     return (
         <Page title='Shipment details | CV Shop'>
             <Container sx={{ pt: 3 }}>
                 <Stack spacing={1}>
                     <Typography variant='h6'>Shipping address</Typography>
                     <Typography variant='subtitle1'>Choose from the available shipping addresses below:</Typography>
-                    <ShipItem>
-                        <Tag>Default</Tag>
-                        <Edit>
-                            <i className="bi bi-pencil-square"></i>
-                        </Edit>
-                        <Typography variant='subtitle2' component='p'>Pihe</Typography>
-                        <Typography variant='body2' component='p'>Address: Chùa liên trì, Xã Suối Cao, Huyện Xuân Lộc, Đồng Nai Việt Nam</Typography>
-                        <Typography variant='body2' component='p'>Phone: 0586181641</Typography>
-                        <Select component={RouterLink} to={PATH_CHECKOUT.payment} sx={{ my: 2 }}>
-                            Delivered to this location
-                        </Select>
-                    </ShipItem>
+                    {!isFilledInfor && <ShippingForm />}
+                    {isFilledInfor && (
+                        <ShipItem>
+                            <Tag>Default</Tag>
+                            <Edit>
+                                <i className="bi bi-pencil-square"></i>
+                            </Edit>
+                            <Typography variant='subtitle2' component='p'>{user.name}</Typography>
+                            <Typography variant='body2' component='p'>Address: {user.address}</Typography>
+                            <Typography variant='body2' component='p'>Phone: {user.phone}</Typography>
+                            <Select component={RouterLink} to={isIntendingCart ? PATH_PAGE.cart : PATH_CHECKOUT.payment} sx={{ my: 2 }}>
+                                Delivered to this location
+                            </Select>
+                        </ShipItem>
+                    )}
                 </Stack>
             </Container>
         </Page>

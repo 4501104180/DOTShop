@@ -43,7 +43,7 @@ const TotalPrice = ({ user, cart }) => {
             });
             return;
         }
-        const isFilledInfor = Object.values(user).every(infor => infor !== '');
+        const isFilledInfor = phone !== '' || address !== '';
         history.push(isFilledInfor ? PATH_CHECKOUT.payment : `${PATH_CHECKOUT.shipping}?isIntendingCart=1`);
     };
     return (

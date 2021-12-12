@@ -1,61 +1,42 @@
+import PropTypes from 'prop-types';
 import { styled } from '@mui/material/styles';
 import { Stack, Typography } from '@mui/material';
 
+// components
 import Image from '../Image';
+// utils
+import { toVND } from '../../utils/formatMoney';
 
-const Delivery = () => {
+const propTypes = {
+    cart: PropTypes.array
+};
+
+const Delivery = ({ cart }) => {
     return (
         <Stack sx={{ mb: 3 }}>
             <Typography variant='subtitle2' sx={{ mb: 1 }}>1. Delivery form</Typography>
             <Wrapper>
-                <Item>
-                    <VAT>Freeship</VAT>
-                    <Image
-                        src='https://salt.tikicdn.com/cache/400x400/ts/product/a5/48/47/cde8081e0b3dad57dff98792f8f07009.jpg.webp'
-                        alt=''
-                        sx={{ width: '86px', height: '86px' }}
-                    />
-                    <Stack sx={{ width: 'calc(100% - 95px)' }}>
-                        <Name>
-                            <Typography variant='body2'>
-                                Laptop Dell Inspiron 14 5406 TYCJN1 (Core i7-1165G7/ 8GB DDR4 3200MHz/ 512GB M.2 PCIe NVMe/ MX330 2GB GDDR5/ 14 FHD IPS/ Win10) - Hàng Chính Hãng
-                            </Typography>
-                        </Name>
-                        <Typography variant='subtitle2'>24.490.200 ₫ | x3</Typography>
-                    </Stack>
-                </Item>
-                <Item>
-                    <VAT>Freeship</VAT>
-                    <Image
-                        src='https://salt.tikicdn.com/cache/400x400/ts/product/a5/48/47/cde8081e0b3dad57dff98792f8f07009.jpg.webp'
-                        alt=''
-                        sx={{ width: '86px', height: '86px' }}
-                    />
-                    <Stack sx={{ width: 'calc(100% - 95px)' }}>
-                        <Name>
-                            <Typography variant='body2'>
-                                Laptop Dell Inspiron 14 5406 TYCJN1 (Core i7-1165G7/ 8GB DDR4 3200MHz/ 512GB M.2 PCIe NVMe/ MX330 2GB GDDR5/ 14 FHD IPS/ Win10) - Hàng Chính Hãng
-                            </Typography>
-                        </Name>
-                        <Typography variant='subtitle2'>24.490.200 ₫ | x3</Typography>
-                    </Stack>
-                </Item>
-                <Item>
-                    <VAT>Freeship</VAT>
-                    <Image
-                        src='https://salt.tikicdn.com/cache/400x400/ts/product/a5/48/47/cde8081e0b3dad57dff98792f8f07009.jpg.webp'
-                        alt=''
-                        sx={{ width: '86px', height: '86px' }}
-                    />
-                    <Stack sx={{ width: 'calc(100% - 95px)' }}>
-                        <Name>
-                            <Typography variant='body2'>
-                                Laptop Dell Inspiron 14 5406 TYCJN1 (Core i7-1165G7/ 8GB DDR4 3200MHz/ 512GB M.2 PCIe NVMe/ MX330 2GB GDDR5/ 14 FHD IPS/ Win10) - Hàng Chính Hãng
-                            </Typography>
-                        </Name>
-                        <Typography variant='subtitle2'>24.490.200 ₫ | x3</Typography>
-                    </Stack>
-                </Item>
+                {cart && cart.map(item => {
+                    const { _id, images, name, amount, VATFee, price } = item;
+                    return (
+                        <Item key={_id}>
+                            <VAT>{VATFee > 0 ? toVND(VATFee) : 'Freeship'}</VAT>
+                            <Image
+                                src={images[0]}
+                                alt={name}
+                                sx={{ width: '86px', height: '86px' }}
+                            />
+                            <Stack sx={{ width: 'calc(100% - 95px)' }}>
+                                <Name>
+                                    <Typography variant='body2'>
+                                        {name}
+                                    </Typography>
+                                </Name>
+                                <Typography variant='subtitle2'>{toVND(price)} | x{amount}</Typography>
+                            </Stack>
+                        </Item>
+                    )
+                })}
             </Wrapper>
         </Stack>
     );
@@ -93,7 +74,9 @@ const VAT = styled('span')({
     display: 'block',
     fontSize: '12px',
     fontWeight: 'bold',
-    color: 'rgb(0, 153, 0)'
+    color: '#F53D2D'
 });
+
+Delivery.propTypes = propTypes;
 
 export default Delivery;

@@ -19,6 +19,12 @@ const accountApi = {
         return axiosInstance.get(url);
     },
 
+    // [PATCH] /accounts/profile
+    editProfile: body => {
+        const url = '/accounts/profile';
+        return axiosInstance.patch(url, body);
+    },
+
     // [POST] /accounts/login
     login: (email, password) => {
         const url = '/accounts/login';
