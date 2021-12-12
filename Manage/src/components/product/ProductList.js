@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import MaterialTable from "@material-table/core";
+import { ExportCsv, ExportPdf } from '@material-table/exporters';
 import { Typography, Tooltip, Alert } from "@mui/material";
 import { AddCircle, Edit, Delete } from "@mui/icons-material";
 import { useConfirm } from "material-ui-confirm";
@@ -78,6 +79,13 @@ const options = {
   addRowPosition: "first",
   actionsColumnIndex: -1,
   tableLayout: "fixed",
+  exportMenu: [{
+    label: 'Export PDF',
+    exportFunc: (cols, datas) => ExportPdf(cols, datas, 'ProductPdf')
+  }, {
+    label: 'Export CSV',
+    exportFunc: (cols, datas) => ExportCsv(cols, datas, 'ProductCsv')
+  }]
 };
 
 const ProductList = () => {
@@ -112,22 +120,22 @@ const ProductList = () => {
   };
   const handleDeleteSelected = async _data => {
     try {
-        await confirm({
-            title: 'Are you sure to Delete selected Products?',
-            content: <Alert severity='error'>Selected products will move to recycle bin</Alert>,
-            confirmationButtonProps: {
-                color: 'error'
-            }
-        });
-        const deleteIds = _data.map(item => item._id);
-        const res = await productApi.deletedProductAll(deleteIds);
-        const { productIDs } = res;
-        const newProduct = products.filter(_product => !productIDs.includes(_product._id));
-        setProducts(newProduct);
+      await confirm({
+        title: 'Are you sure to Delete selected Products?',
+        content: <Alert severity='error'>Selected products will move to recycle bin</Alert>,
+        confirmationButtonProps: {
+          color: 'error'
+        }
+      });
+      const deleteIds = _data.map(item => item._id);
+      const res = await productApi.deletedProductAll(deleteIds);
+      const { productIDs } = res;
+      const newProduct = products.filter(_product => !productIDs.includes(_product._id));
+      setProducts(newProduct);
     } catch (error) {
 
     }
-}
+  }
   return (
     <>
       {products && (

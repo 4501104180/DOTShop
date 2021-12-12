@@ -1,15 +1,16 @@
 import { useNavigate } from 'react-router-dom';
 import MaterialTable from '@material-table/core';
+import { ExportCsv, ExportPdf } from '@material-table/exporters';
 import { Stack, Box, Typography, Alert } from '@mui/material';
 import { AddCircle, Edit, Delete } from '@mui/icons-material';
-import { useState, useEffect} from 'react';
+import { useState, useEffect } from 'react';
 import { useConfirm } from 'material-ui-confirm';
 //apis
 import accountApi from '../../apis/accountApi';
 // path
 import { PATH_DASHBOARD } from '../../routes/path'
 // utils
-import { fDate} from '../../utils/formatDate'
+import { fDate } from '../../utils/formatDate'
 
 const columns = [
     {
@@ -18,7 +19,7 @@ const columns = [
         width: '30%',
     },
     {
-        
+
         field: 'name',
         title: 'Name',
         width: '25%',
@@ -71,7 +72,14 @@ const options = {
     selection: true,
     addRowPosition: 'first',
     actionsColumnIndex: -1,
-    tableLayout: 'fixed'
+    tableLayout: 'fixed',
+    exportMenu: [{
+        label: 'Export PDF',
+        exportFunc: (cols, datas) => ExportPdf(cols, datas, 'AccountPdf')
+    }, {
+        label: 'Export CSV',
+        exportFunc: (cols, datas) => ExportCsv(cols, datas, 'AccountCsv')
+    }]
 };
 
 const AccountList = () => {
@@ -99,7 +107,7 @@ const AccountList = () => {
             const newAccount = accounts.filter(_account => _account._id !== accountID);
             setAccounts(newAccount);
         } catch (error) {
-            
+
         }
     }
     const handleDeleteSelected = async _data => {
@@ -117,7 +125,7 @@ const AccountList = () => {
             const newAccount = accounts.filter(_account => !accountIDs.includes(_account._id));
             setAccounts(newAccount);
         } catch (error) {
-            
+
         }
     }
     return (
@@ -128,7 +136,7 @@ const AccountList = () => {
                     columns={columns}
                     data={accounts}
                     options={options}
-                   
+
                     actions={[
                         {
                             icon: () => <Edit color='warning' />,

@@ -1,15 +1,16 @@
 import { useNavigate } from 'react-router-dom';
+import { ExportCsv, ExportPdf } from '@material-table/exporters';
 import MaterialTable from '@material-table/core';
 import { Tooltip, Alert, Typography } from '@mui/material';
 import { AddCircle, Edit, Delete } from '@mui/icons-material';
-import { useState, useEffect} from 'react';
+import { useState, useEffect } from 'react';
 import { useConfirm } from "material-ui-confirm";
 //apis
 import categoryApi from '../../apis/categoryApi';
 // path
 import { PATH_DASHBOARD } from '../../routes/path';
 //utils
-import { fDate} from '../../utils/formatDate';
+import { fDate } from '../../utils/formatDate';
 const columns = [
     {
         field: 'title',
@@ -34,7 +35,7 @@ const columns = [
                     }}
                 />
             </Tooltip>
-            
+
         ),
         width: '20%'
     },
@@ -73,7 +74,14 @@ const options = {
     selection: true,
     addRowPosition: 'first',
     actionsColumnIndex: -1,
-    tableLayout: 'fixed'
+    tableLayout: 'fixed',
+    exportMenu: [{
+        label: 'Export PDF',
+        exportFunc: (cols, datas) => ExportPdf(cols, datas, 'CategoryPdf')
+    }, {
+        label: 'Export CSV',
+        exportFunc: (cols, datas) => ExportCsv(cols, datas, 'CategoryCsv')
+    }]
 };
 
 const CategoryList = () => {
@@ -84,18 +92,19 @@ const CategoryList = () => {
         const getCategories = async () => {
             const categories = await categoryApi.findAll();
             setCategories(categories);
+            console.log(categories);
         }
         getCategories();
     }, []);
     const handleDelete = async _categoryID => {
         try {
-          await confirm({
-            title: "Are you sure to Delete this Category?",
-            content:  <Alert severity="error">This Category will move to recycle bin</Alert>,
-            confirmationButtonProps: {
-              color: "error",
-            },
-          });
+            await confirm({
+                title: "Are you sure to Delete this Category?",
+                content: <Alert severity="error">This Category will move to recycle bin</Alert>,
+                confirmationButtonProps: {
+                    color: "error",
+                },
+            });
             const res = await categoryApi.deleteCategorybyID(_categoryID);
             const { categoryID } = res;
             const newCategory = categories.filter(_category => !categoryID.includes(_category._id));
@@ -119,7 +128,7 @@ const CategoryList = () => {
             const newCategory = categories.filter(_category => !categoryIDs.includes(_category._id));
             setCategories(newCategory);
         } catch (error) {
-            
+
         }
     }
     return (
@@ -157,7 +166,7 @@ const CategoryList = () => {
                     ]}
                 />
             )}
-            {!categories && "Loading..."} 
+            {!categories && "Loading..."}
         </>
     );
 };
